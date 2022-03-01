@@ -20,7 +20,8 @@ jobs:
   get_build_info:
     runs-on: "ubuntu-latest"
     outputs:
-      tagsjson:      "${{ steps.moodle_gitinfo.outputs.tagsjson }}"
+      tags:           "${{ steps.moodle_gitinfo.outputs.tags }}"
+      retagging:      "${{ steps.moodle_gitinfo.outputs.retagging }}"
       stablebranches: "${{ steps.moodle_gitinfo.outputs.stablebranches }}"
 
     steps:
@@ -113,14 +114,19 @@ jobs:
                   )
               fi
           done
-          version_retagging=$( echo "${version_retagging}" | jq -c '.' )
 
           # Debug information about tags and write usable output
-          outputTags="$( echo "${build_tags}" | jq --argjson retagging "${version_retagging}" '. + { "retagging": $retagging }' )"
+          outputTags="$( echo "${build_tags}" )"
           echo
           echo "Tags being build:"
           echo "${outputTags}"
-          echo "::set-output name=tagsjson::$( echo "${outputTags}" | jq -c )"
+          echo "::set-output name=tags::$( echo "${outputTags}" | jq -c )"
+          # Debug information about tags and write usable output
+          outputRetagging="$( echo "${version_retagging}" | jq '{ "retagging": . }' )"
+          echo
+          echo "Tags being retagged:"
+          echo "${outputRetagging}"
+          echo "::set-output name=retagging::$( echo "${outputRetagging}" | jq -c )"
           # Debug information about stable branches and write usable output
           outputBranches="$( echo "${branchesToRenew}" | jq --raw-input --slurp 'split("\n") | .[0:-1] | { "branches": . }' )"
           echo
@@ -181,7 +187,7 @@ jobs:
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: true
-      matrix: "${{ fromJSON( needs.get_build_info.outputs.tagsjson ) }}"
+      matrix: "${{ fromJSON( needs.get_build_info.outputs.tags ) }}"
 
     steps:
 
@@ -231,7 +237,7 @@ jobs:
         run: |
           # fetch all alternative tags
           alternativeTags=$(
-            echo '${{ needs.get_tags_to_build.outputs.tagsjson }}' |
+            echo '${{ needs.get_tags_to_build.outputs.retagging }}' |
             jq '.retagging | keys[] as $k | if ( .[$k] == "${{ matrix.tags }}" ) then [ $k ] else empty end' |
             jq -s add
           )
@@ -285,7 +291,7 @@ jobs:
           dt=$( date '+%Y-%m-%d %H:%M (%Z)' )
           fileName="./docker/built.json"
 
-          tagList=$( echo '${{ needs.get_tags_to_build.outputs.tagsjson }}' | jq -r '.tags[]' )
+          tagList=$( echo '${{ needs.get_tags_to_build.outputs.tags }}' | jq -r '.tags[]' )
           branchList=$( echo '${{ needs.get_tags_to_build.outputs.stablebranches }}' | jq -r '.branches[]' )
 
           tags=$(
