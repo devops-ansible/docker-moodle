@@ -34,7 +34,8 @@ jobs:
       - name: "Checkout Moodle Git Repo"
         uses: "actions/checkout@v2"
         with:
-          repository: "git://git.moodle.org/moodle.git"
+          # repository: "git://git.moodle.org/moodle.git"
+          repository: "moodle/moodle"
           path: "docker/app"
 
       - name: "prepare git refs"
@@ -152,7 +153,8 @@ jobs:
       - name: "Checkout Moodle Git repository"
         uses: "actions/checkout@v2"
         with:
-          repository: "git://git.moodle.org/moodle.git"
+          # repository: "git://git.moodle.org/moodle.git"
+          repository: "moodle/moodle"
           ref: "${{ matrix.branches }}"
           path: "docker/app"
 
@@ -198,7 +200,8 @@ jobs:
       - name: "Checkout Moodle Git repository"
         uses: "actions/checkout@v2"
         with:
-          repository: "git://git.moodle.org/moodle.git"
+          # repository: "git://git.moodle.org/moodle.git"
+          repository: "moodle/moodle"
           ref: "${{ matrix.tags }}"
           path: "docker/app"
 
