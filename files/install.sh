@@ -33,3 +33,5 @@ apt-get -y clean
 apt-get -y autoclean
 apt-get -y autoremove
 rm -r /var/lib/apt/lists/*
+
+rm -rf "${APACHE_WORKDIR}/.git"

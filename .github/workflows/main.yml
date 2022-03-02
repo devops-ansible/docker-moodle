@@ -237,7 +237,7 @@ jobs:
         run: |
           # fetch all alternative tags
           alternativeTags=$(
-            echo '${{ needs.get_tags_to_build.outputs.retagging }}' |
+            echo '${{ needs.get_build_info.outputs.retagging }}' |
             jq '.retagging | keys[] as $k | if ( .[$k] == "${{ matrix.tags }}" ) then [ $k ] else empty end' |
             jq -s add
           )
@@ -291,8 +291,8 @@ jobs:
           dt=$( date '+%Y-%m-%d %H:%M (%Z)' )
           fileName="./docker/built.json"
 
-          tagList=$( echo '${{ needs.get_tags_to_build.outputs.tags }}' | jq -r '.tags[]' )
-          branchList=$( echo '${{ needs.get_tags_to_build.outputs.stablebranches }}' | jq -r '.branches[]' )
+          tagList=$( echo '${{ needs.get_build_info.outputs.tags }}' | jq -r '.tags[]' )
+          branchList=$( echo '${{ needs.get_build_info.outputs.stablebranches }}' | jq -r '.branches[]' )
 
           tags=$(
               echo "${built}" |
