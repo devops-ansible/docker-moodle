@@ -291,6 +291,7 @@ jobs:
           dt=$( date '+%Y-%m-%d %H:%M (%Z)' )
           fileName="./docker/built.json"
 
+          built=$( cat "${fileName}" | jq )
           tagList=$( echo '${{ needs.get_build_info.outputs.tags }}' | jq -r '.tags[]' )
           branchList=$( echo '${{ needs.get_build_info.outputs.stablebranches }}' | jq -r '.branches[]' )
 
@@ -314,7 +315,7 @@ jobs:
           echo "${tags}" |
           jq '{ "tags" : . }' |
           jq --argjson branchJSON "${branches}" '.stable_branches = $branchJSON' \
-          > "${fileName}"
+              > "${fileName}"
 
       - name: "Commit last built information"
         uses: "stefanzweifel/git-auto-commit-action@v4"
