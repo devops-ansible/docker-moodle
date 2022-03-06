@@ -21,7 +21,13 @@ apt-get -yq install -y --no-install-recommends \
 docker-php-ext-install -j$(nproc) \
     intl \
     soap \
-    opcache
+    opcache \
+    mysqli
+docker-php-ext-enable \
+    intl \
+    soap \
+    opcache \
+    mysqli
 
 ###
 ## CleanUp
