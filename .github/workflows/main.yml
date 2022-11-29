@@ -27,13 +27,13 @@ jobs:
     steps:
 
       - name: "Checkout this repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           ref: "master"
           path: "docker"
 
       - name: "Checkout Moodle Git Repo"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           # repository: "git://git.moodle.org/moodle.git"
           repository: "moodle/moodle"
@@ -120,19 +120,19 @@ jobs:
           echo
           echo "Tags being build:"
           echo "${outputTags}"
-          echo "::set-output name=tags::$( echo "${outputTags}" | jq -c )"
+          echo "tags=$( echo "${outputTags}" | jq -c )" >> $GITHUB_OUTPUT
           # Debug information about tags and write usable output
           outputRetagging="$( echo "${version_retagging}" | jq '{ "retagging": . }' )"
           echo
           echo "Tags being retagged:"
           echo "${outputRetagging}"
-          echo "::set-output name=retagging::$( echo "${outputRetagging}" | jq -c )"
+          echo "retagging=$( echo "${outputRetagging}" | jq -c )" >> $GITHUB_OUTPUT
           # Debug information about stable branches and write usable output
           outputBranches="$( echo "${branchesToRenew}" | jq --raw-input --slurp 'split("\n") | .[0:-1] | { "branches": . }' )"
           echo
           echo "Stable branches to be built:"
           echo "${outputBranches}"
-          echo "::set-output name=stablebranches::$( echo "${outputBranches}" | jq -c )"
+          echo "stablebranches=$( echo "${outputBranches}" | jq -c )" >> $GITHUB_OUTPUT
 
   build_missing_images_by_stable_branches:
 
@@ -145,19 +145,19 @@ jobs:
     steps:
 
       - name: "Login to DockerHub"
-        uses: "docker/login-action@v1"
+        uses: "docker/login-action@v2"
         with:
           username: "${{ secrets.DOCKERHUB_USER }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
       - name: "Checkout this repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           ref: "master"
           path: "docker"
 
       - name: "Checkout Moodle Git repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           # repository: "git://git.moodle.org/moodle.git"
           repository: "moodle/moodle"
@@ -165,14 +165,14 @@ jobs:
           path: "docker/app"
 
       - name: "Set up QEMU"
-        uses: "docker/setup-qemu-action@v1"
+        uses: "docker/setup-qemu-action@v2"
 
       - name: "Set up Docker Buildx"
-        uses: "docker/setup-buildx-action@v1"
+        uses: "docker/setup-buildx-action@v2"
 
       - name: "Build and push ${{ matrix.branches }}"
         id: "docker_build"
-        uses: "docker/build-push-action@v2"
+        uses: "docker/build-push-action@v3"
         with:
           push: true
           tags: "${{ env.IMAGE_NAME }}:${{ matrix.branches }}"
@@ -192,19 +192,19 @@ jobs:
     steps:
 
       - name: "Login to DockerHub"
-        uses: "docker/login-action@v1"
+        uses: "docker/login-action@v2"
         with:
           username: "${{ secrets.DOCKERHUB_USER }}"
           password: "${{ secrets.DOCKERHUB_TOKEN }}"
 
       - name: "Checkout this repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           ref: "master"
           path: "docker"
 
       - name: "Checkout Moodle Git repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           # repository: "git://git.moodle.org/moodle.git"
           repository: "moodle/moodle"
@@ -212,14 +212,14 @@ jobs:
           path: "docker/app"
 
       - name: "Set up QEMU"
-        uses: "docker/setup-qemu-action@v1"
+        uses: "docker/setup-qemu-action@v2"
 
       - name: "Set up Docker Buildx"
-        uses: "docker/setup-buildx-action@v1"
+        uses: "docker/setup-buildx-action@v2"
 
       - name: "Build and push ${{ matrix.tags }}"
         id: "docker_build"
-        uses: "docker/build-push-action@v2"
+        uses: "docker/build-push-action@v3"
         with:
           push: true
           tags: "${{ env.IMAGE_NAME }}:${{ matrix.tags }}"
@@ -260,7 +260,7 @@ jobs:
           else
             echo 'No alternative tags to push for tag “${{ matrix.tags }}”'
           fi
-          echo "::set-output name=retag::${retag}"
+          echo "retag=${retag}" >> $GITHUB_OUTPUT
 
       - name: "Push re-tagged images "
         uses: "akhilerm/tag-push-action@v2.0.0"
@@ -281,7 +281,7 @@ jobs:
     steps:
 
       - name: "Checkout this repository"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           ref: "master"
           path: "docker"
